@@ -749,7 +749,9 @@ EnableEstats(
         return FALSE;
     }
     BOOL ret = TRUE;
-    if (NO_ERROR == GetTcpRow(socket, flags.use_ipv6_flag, tcp_row)) {
+    char msgbuf [256];
+    int errorStatus = GetTcpRow(socket, flags.use_ipv6_flag, tcp_row);
+    if (NO_ERROR == errorStatus) {
         ret &= ToggleTcpEstats(tcp_row, TcpConnectionEstatsData, TRUE, flags.use_ipv6_flag);
         ret &= ToggleTcpEstats(tcp_row, TcpConnectionEstatsSndCong, TRUE, flags.use_ipv6_flag);
         ret &= ToggleTcpEstats(tcp_row, TcpConnectionEstatsPath, TRUE, flags.use_ipv6_flag);
@@ -760,7 +762,18 @@ EnableEstats(
         ret &= ToggleTcpEstats(tcp_row, TcpConnectionEstatsFineRtt, TRUE, flags.use_ipv6_flag);
     } else {
         ret = FALSE;
-        MSG("Could not get TcpRow");
+        MSG("Could not get TcpRow\n");
+
+        FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,   // flags
+               NULL,                // lpsource
+               errorStatus,         // message id
+               MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),    // languageid
+               msgbuf,              // output buffer
+               sizeof (msgbuf),     // size of msgbuf, bytes
+               NULL);               // va_list of arguments
+        if (! *msgbuf) {
+           sprintf (msgbuf, "%d", err);  // provide error # if no string available
+        }
     }
     return ret;
 }
