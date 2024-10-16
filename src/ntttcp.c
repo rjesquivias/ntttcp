@@ -772,7 +772,7 @@ EnableEstats(
                sizeof (msgbuf),     // size of msgbuf, bytes
                NULL);               // va_list of arguments
         if (! *msgbuf) {
-           sprintf (msgbuf, "%d", err);  // provide error # if no string available
+           sprintf (msgbuf, "%d", errorStatus);  // provide error # if no string available
         }
     }
     return ret;
